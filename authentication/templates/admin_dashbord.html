@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block extra_styles %}
+.dashboard-container {
+    background: #ffffff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+th {
+    background-color: #6c5ce7;
+    color: white;
+}
+.chat-box {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+h2 {
+    color: #6c5ce7;
+    margin-bottom: 20px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Admin Dashboard</h2>
+    <div class="table-wrapper">
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Chat History (Last 24h)</th>
+            </tr>
+            {% for u in user_chat %}
+            <tr>
+                <td>{{ u.username }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                    <div class="chat-box">
+                        {% for msg in u.chat_history %}
+                            <b>{{ msg.sender|title }}:</b> {{ msg.text }} <br>
+                        {% empty %}
+                            No chat yet
+                        {% endfor %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}
+

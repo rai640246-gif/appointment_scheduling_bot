@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Chatbot{% endblock %}
+
+{% block extra_styles %}
+/* Existing chat styles */
+.chat-container { flex: 1; background: #f8f9fa; margin: 20px auto; width: 80%; max-width: 900px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+.chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+.message { max-width: 70%; margin-bottom: 12px; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.4; }
+.user { align-self: flex-end; background: #6c5ce7; color: #fff; border-bottom-right-radius: 4px; }
+.bot { align-self: flex-start; background: #dfe6e9; color: #2d3436; border-bottom-left-radius: 4px; }
+.chat-input { display: flex; padding: 15px; background: #fff; border-top: 1px solid #dfe6e9; }
+.chat-input input { flex: 1; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 14px; outline: none; transition: 0.3s; }
+.chat-input input:focus { border-color: #74b9ff; }
+.chat-input button { margin-left: 10px; padding: 12px 18px; background: #6c5ce7; border: none; border-radius: 8px; color: white; font-size: 14px; cursor: pointer; transition: 0.3s; }
+.chat-input button:hover { background: #74b9ff; }
+
+/* Pop-up styles */
+#service-popup {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+#service-popup .popup-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+}
+#service-popup h3 { margin-bottom: 15px; color: #6c5ce7; }
+#service-popup ul { list-style: none; padding: 0; margin: 0 0 20px 0; }
+#service-popup ul li { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+#service-popup ul li button { padding: 6px 12px; background: #6c5ce7; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
+#service-popup ul li button:hover { background: #74b9ff; }
+{% endblock %}
+
+{% block content %}
+<!-- Pop-up -->
+<div id="service-popup">
+    <div class="popup-content">
+        <h3>Available Services</h3>
+        <ul>
+            {% for service in services %}
+                <li>
+                    <span>{{ service.name }}</span>
+                    <button class="select-service" data-service="{{ service.name }}">Select</button>
+                </li>
+            {% empty %}
+                <li>No services available</li>
+            {% endfor %}
+        </ul>
+        <button id="close-popup">Close</button>
+    </div>
+</div>
+
+<div class="chat-container">
+    <div class="chat-box" id="chat-box">
+        <div class="message bot">Hi {{ request.user.username }}! I’m your assistant for {{ request.session.selected_service|default:"our services" }}. How can I help you today?</div>
+
+    </div>
+    <form class="chat-input" id="chat-form">
+        {% csrf_token %}
+        <input type="text" id="user-input" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+const chatForm = document.getElementById('chat-form');
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+
+// Chat submit
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    // User message
+    const userMsg = document.createElement('div');
+    userMsg.classList.add('message', 'user');
+    userMsg.textContent = text;
+    chatBox.appendChild(userMsg);
+    userInput.value = '';
+
+    // Send to backend
+    const response = await fetch("{% url 'save_chat' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `message=${encodeURIComponent(text)}`
+    });
+
+    const data = await response.json();
+
+    // Bot message
+    const botMsg = document.createElement('div');
+    botMsg.classList.add('message', 'bot');
+    botMsg.textContent = data.reply || "No response.";
+    chatBox.appendChild(botMsg);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+// Pop-up close
+const popup = document.getElementById('service-popup');
+const closeBtn = document.getElementById('close-popup');
+
+closeBtn.addEventListener('click', () => {
+    popup.style.display = 'none';
+});
+
+// Service select buttons
+document.querySelectorAll('.select-service').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const selectedService = btn.getAttribute('data-service');
+
+        // Save selected service to backend session
+        const response = await fetch("{% url 'select_service' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `service=${encodeURIComponent(selectedService)}`
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert(`You selected: ${selectedService}`);
+            popup.style.display = 'none';
+        }
+    });
+});
+
+</script>
+{% endblock %}

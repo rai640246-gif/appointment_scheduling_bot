@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Service{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .delete-container {
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        max-width: 500px;
+        margin: 50px auto;
+        text-align: center;
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+        color: #e63946;
+        font-weight: 600;
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 30px;
+    }
+
+    .btn-confirm, .btn-cancel {
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 15px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+        margin: 5px;
+    }
+
+    .btn-confirm {
+        background-color: #e63946;
+        color: #fff;
+    }
+
+    .btn-confirm:hover {
+        background-color: #d62828;
+    }
+
+    .btn-cancel {
+        background-color: #f1f3f5;
+        color: #2d3436;
+    }
+
+    .btn-cancel:hover {
+        background-color: #dee2e6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <h2>Delete Service</h2>
+    <p>Are you sure you want to delete "<strong>{{ service.name }}</strong>"?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-confirm">Yes, Delete</button>
+        <a href="{% url 'service_list' %}" class="btn-cancel">Cancel</a>
+    </form>
+</div>
+{% endblock %}

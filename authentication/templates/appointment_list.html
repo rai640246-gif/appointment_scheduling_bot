@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointments List{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .appointments-container {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    h3 {
+        text-align: center;
+        color: #2d3436;
+        margin-bottom: 25px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #dfe6e9;
+    }
+
+    th {
+        background-color: #6c5ce7;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f2f6;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #636e72;
+        padding: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="appointments-container">
+    <h3>📅 Appointment List</h3>
+
+    {% if appointments %}
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Service</th>
+                <th>Original Text</th>
+                <th>Detected Date (IST)</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in appointments %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ a.user }}</td>
+                <td>{{ a.email }}</td>
+                <td>{{ a.service }}</td>
+                <td>{{ a.original_text }}</td>
+                <td>{{ a.detected_date }}</td>
+                <td>{{ a.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="no-data">No appointments found.</p>
+    {% endif %}
+</div>
+{% endblock %}

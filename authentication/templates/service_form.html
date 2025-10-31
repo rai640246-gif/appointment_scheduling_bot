@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block extra_styles %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .form-container {
+        background: #ffffff;
+        padding: 40px;
+        margin: 40px auto;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        max-width: 600px;
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+        color: #4b4bff;
+        font-weight: 600;
+        font-size: 26px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .service-form p {
+        margin-bottom: 20px;
+    }
+
+    .service-form label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .service-form input[type="text"],
+    .service-form textarea,
+    .service-form select {
+        padding: 12px 14px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 15px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fefefe;
+    }
+
+    .service-form input:focus,
+    .service-form textarea:focus,
+    .service-form select:focus {
+        border-color: #4b4bff;
+        box-shadow: 0 0 0 3px rgba(75, 75, 255, 0.15);
+        outline: none;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+    .btn-save {
+        background-color: #4b4bff;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-save:hover {
+        background-color: #3737e5;
+    }
+
+    .btn-cancel {
+        background-color: #f1f3f5;
+        color: #2d3436;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-cancel:hover {
+        background-color: #dee2e6;
+    }
+
+    @media (max-width: 500px) {
+        .form-actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-save,
+        .btn-cancel {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block title %}Service Form{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>{{ title }}</h2>
+
+    <form method="post" class="service-form">
+        {% csrf_token %}
+        <div class="form-fields">
+            {{ form.as_p }}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-save">💾 Save</button>
+            <a href="{% url 'service_list' %}" class="btn-cancel">✖ Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
